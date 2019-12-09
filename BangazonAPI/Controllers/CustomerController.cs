@@ -58,7 +58,7 @@ namespace BangazonAPI.Controllers
         }
 
         // GET: api/Customer/5
-        [HttpGet("{id}", Name = "Get")]
+        [HttpGet("{id}", Name = "GetCustomer")]
        
             public async Task<IActionResult> Get([FromRoute] int id)
             {
