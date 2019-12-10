@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using BangazonAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using BangazonAPI.Models;
 
 namespace BangazonAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomerController : ControllerBase
+    public class EmployeeController : ControllerBase
     {
         private readonly IConfiguration _config;
 
-        public CustomerController(IConfiguration config)
+        public EmployeeController(IConfiguration config)
         {
             _config = config;
         }
@@ -28,105 +27,96 @@ namespace BangazonAPI.Controllers
                 return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
             }
         }
-        // GET: api/Customer
+        // GET: api/Employee
         [HttpGet]
-        public async Task<IActionResult> Get(string q)
+        public async Task<IActionResult> Get()
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    string query = $"SELECT Id, FirstName, LastName FROM Customer";
-                  //if (include == "products")
-                  //  {
-                  //      query = "SELECT Customer.Id AS 'Id', FirstName, LastName, product.title, product.quantity, product.description FROM Customer " +
-                  //          "Join product ON product.customerId = Customer.Id ";
-                  //  }
-                  //if (include == "payments")
-                  //  {
-                  //      query = "SELECT Customer.Id AS 'Id', FirstName, LastName, PaymentType.AcctNumber," +
-                  //          " PaymentType.Name AS 'PaymentType Name' FROM Customer JOIN PaymentType ON PaymentType.CustomerId = Customer.Id";
-                  //  }
-                  if (q != null)
-                    {
-                        query += $" WHERE FirstName LIKE '%{q}%' OR LastName LIKE '%{q}%'";
-                    }
+                    string query = "SELECT Id, FirstName, LastName, DepartmentId, isSupervisor FROM Employee";
+                   
                     cmd.CommandText = query;
                     SqlDataReader reader = cmd.ExecuteReader();
-                    List<Customer> customers = new List<Customer>();
+                    List<Employee> employees = new List<Employee>();
                     while (reader.Read())
                     {
-                        Customer customer = new Customer
+                        Employee employee = new Employee
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("isSupervisor"))
                         };
-                        customers.Add(customer);
+                        employees.Add(employee);
                     }
                     reader.Close();
-                    return Ok(customers);
+                    return Ok(employees);
                 }
             }
         }
 
-        // GET: api/Customer/5
-        [HttpGet("{id}", Name = "GetCustomer")]
-       
-            public async Task<IActionResult> Get([FromRoute] int id)
-            {
-                using (SqlConnection conn = Connection)
-                {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = $"SELECT Id, FirstName, LastName FROM Customer WHERE Customer.Id = @Id";
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
-                        SqlDataReader reader = cmd.ExecuteReader();
-                        Customer customer = null;
-                        if (reader.Read())
-                        {
-                            customer = new Customer
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                LastName = reader.GetString(reader.GetOrdinal("LastName"))
-
-                            };
-                        }
-                        reader.Close();
-
-                        return Ok(customer);
-                    }
-                } 
-            }
-        
-
-        // POST: api/Customer
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Customer customer)
+        // GET: api/Employee/5
+        [HttpGet("{id}", Name = "GetEmployee")]
+        public async Task<IActionResult> Get([FromRoute] int id)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Customer (firstName, lastName)
-                                        OUTPUT INSERTED.Id
-                                        VALUES (@firstName, @lastName)";
-                    cmd.Parameters.Add(new SqlParameter("@firstName", customer.FirstName));
-                    cmd.Parameters.Add(new SqlParameter("@lastName", customer.LastName));
-                    int newId = (int)cmd.ExecuteScalar();
-                    customer.Id = newId;
-                    return CreatedAtRoute("GetCustomer", new { id = newId }, customer);
+                    cmd.CommandText = $"SELECT Id, FirstName, LastName, DepartmentId, isSupervisor FROM Employee WHERE Employee.Id = @Id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    Employee employee = null;
+                    if (reader.Read())
+                    {
+                        employee = new Employee
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("isSupervisor"))
+
+                        };
+                    }
+                    reader.Close();
+
+                    return Ok(employee);
                 }
             }
         }
 
-        // PUT: api/Customer/5
+        // POST: api/Employee
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] Employee employee)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO Employee (firstName, lastName, DepartmentId, isSupervisor)
+                                        OUTPUT INSERTED.Id
+                                        VALUES (@firstName, @lastName, @DepartmentId, @isSupervisor)";
+                    cmd.Parameters.Add(new SqlParameter("@firstName", employee.FirstName));
+                    cmd.Parameters.Add(new SqlParameter("@lastName", employee.LastName));
+                    cmd.Parameters.Add(new SqlParameter("@DepartmentId", employee.DepartmentId));
+                    cmd.Parameters.Add(new SqlParameter("@isSupervisor", employee.IsSupervisor));
+                    int newId = (int)cmd.ExecuteScalar();
+                    employee.Id = newId;
+                    return CreatedAtRoute("GetEmployee", new { id = newId }, employee);
+                }
+            }
+        }
+
+        // PUT: api/Employee/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Customer customer)
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Employee employee)
         {
             try
             {
@@ -135,12 +125,16 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"UPDATE Customer
+                        cmd.CommandText = @"UPDATE Employee
                                             SET FirstName = @FirstName,
-                                                LastName = @LastName
+                                                LastName = @LastName,
+                                                DepartmentId = @DepartmentId,
+                                                isSupervisor = @isSupervisor
                                             WHERE Id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@FirstName", customer.FirstName));
-                        cmd.Parameters.Add(new SqlParameter("@LastName", customer.LastName));
+                        cmd.Parameters.Add(new SqlParameter("@FirstName", employee.FirstName));
+                        cmd.Parameters.Add(new SqlParameter("@LastName", employee.LastName));
+                        cmd.Parameters.Add(new SqlParameter("@DepartmentId", employee.DepartmentId));
+                        cmd.Parameters.Add(new SqlParameter("@isSupervisor", employee.IsSupervisor));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = cmd.ExecuteNonQuery();
@@ -154,7 +148,7 @@ namespace BangazonAPI.Controllers
             }
             catch (Exception)
             {
-                if (!CustomerExists(id))
+                if (!EmployeeExists(id))
                 {
                     return NotFound();
                 }
@@ -176,7 +170,7 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"DELETE FROM Customer WHERE Id = @id";
+                        cmd.CommandText = @"DELETE FROM Employee WHERE Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = cmd.ExecuteNonQuery();
@@ -190,7 +184,7 @@ namespace BangazonAPI.Controllers
             }
             catch (Exception)
             {
-                if (!CustomerExists(id))
+                if (!EmployeeExists(id))
                 {
                     return NotFound();
                 }
@@ -200,7 +194,7 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
-        private bool CustomerExists(int id)
+        private bool EmployeeExists(int id)
         {
             using (SqlConnection conn = Connection)
             {
@@ -208,8 +202,8 @@ namespace BangazonAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, FirstName, LastName
-                        FROM Customer 
+                        SELECT Id, FirstName, LastName, DepartmentId, isSupervisor
+                        FROM Employee 
                         WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
