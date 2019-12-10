@@ -30,7 +30,7 @@ namespace BangazonAPI.Controllers
         }
         // GET: api/Customer
         [HttpGet]
-        public async Task<IActionResult> Get(string q)
+        public async Task<IActionResult> Get(string include, string q)
         {
             using (SqlConnection conn = Connection)
             {
@@ -38,17 +38,17 @@ namespace BangazonAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     string query = $"SELECT Id, FirstName, LastName FROM Customer";
-                  //if (include == "products")
-                  //  {
-                  //      query = "SELECT Customer.Id AS 'Id', FirstName, LastName, product.title, product.quantity, product.description FROM Customer " +
-                  //          "Join product ON product.customerId = Customer.Id ";
-                  //  }
-                  //if (include == "payments")
-                  //  {
-                  //      query = "SELECT Customer.Id AS 'Id', FirstName, LastName, PaymentType.AcctNumber," +
-                  //          " PaymentType.Name AS 'PaymentType Name' FROM Customer JOIN PaymentType ON PaymentType.CustomerId = Customer.Id";
-                  //  }
-                  if (q != null)
+                    if (include == "products")
+                    {
+                        query = "SELECT Customer.Id AS 'Id', FirstName, LastName, product.title, product.quantity, product.description FROM Customer " +
+                            "Join product ON product.customerId = Customer.Id ";
+                    }
+                    if (include == "payments")
+                    {
+                        query = "SELECT Customer.Id AS 'Id', FirstName, LastName, PaymentType.AcctNumber," +
+                            " PaymentType.Name AS 'PaymentType Name' FROM Customer JOIN PaymentType ON PaymentType.CustomerId = Customer.Id";
+                    }
+                    if (q != null)
                     {
                         query += $" WHERE FirstName LIKE '%{q}%' OR LastName LIKE '%{q}%'";
                     }
