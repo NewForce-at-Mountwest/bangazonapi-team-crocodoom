@@ -40,13 +40,15 @@ namespace BangazonAPI.Controllers
                     string query = $"SELECT Id, FirstName, LastName FROM Customer";
                     if (include == "products")
                     {
-                        query = "SELECT Customer.Id AS 'Id', FirstName, LastName, product.title, product.quantity, product.description FROM Customer " +
+                        query = "SELECT Customer.Id AS 'Id', FirstName, LastName, product.Id AS 'ProductId'," +
+                            " product.ProductTypeId AS 'productTypeId', product.price AS 'Price', product.title AS 'title', " +
+                            "product.quantity AS 'quantity', product.description AS 'Description' FROM Customer " +
                             "Join product ON product.customerId = Customer.Id ";
                     }
                     if (include == "payments")
                     {
-                        query = "SELECT Customer.Id AS 'Id', FirstName, LastName, PaymentType.AcctNumber," +
-                            " PaymentType.Name AS 'PaymentType Name' FROM Customer JOIN PaymentType ON PaymentType.CustomerId = Customer.Id";
+                        query = "SELECT Customer.Id AS 'Id', FirstName, LastName, PaymentType.AcctNumber AS 'acct#'," +
+                            "PaymentType.Id AS 'paymentId', PaymentType.Name AS 'PaymentName' FROM Customer JOIN PaymentType ON PaymentType.CustomerId = Customer.Id";
                     }
                     if (q != null)
                     {
@@ -56,14 +58,70 @@ namespace BangazonAPI.Controllers
                     SqlDataReader reader = cmd.ExecuteReader();
                     List<Customer> customers = new List<Customer>();
                     while (reader.Read())
-                    {
+                    { int CustomerIdColumn = reader.GetOrdinal("Id");
+                        int CustomerId = reader.GetInt32(CustomerIdColumn);
                         Customer customer = new Customer
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName"))
                         };
-                        customers.Add(customer);
+                     
+                       
+                        if (include == "payments")
+                        {
+                            Payment payment = new Payment
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("paymentId")),
+                                AcctNumber = reader.GetString(reader.GetOrdinal("acct#")),
+                                CustomerId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("PaymentName"))
+                            };
+                            if (customers.FirstOrDefault(customer => customer.Id == CustomerId) == null)
+                            {
+                                customer.payments.Add(payment);
+                                customers.Add(customer);
+                            }
+                            else
+                            {
+                                Customer customerWithPayment = customers.FirstOrDefault(customer => customer.Id == CustomerId);
+                                customerWithPayment.payments.Add(payment);
+                            }
+                        }
+                     
+                        if (include == "products")
+                        {
+                            Product product = new Product
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                Title = reader.GetString(reader.GetOrdinal("Title")),
+                                ProductTypeId = reader.GetInt32(reader.GetOrdinal("productTypeId")),
+                                CustomerId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Description = reader.GetString(reader.GetOrdinal("Description")),
+                                Price = reader.GetInt32(reader.GetOrdinal("Price")),
+                                Quantity = reader.GetInt32(reader.GetOrdinal("quantity"))
+
+                            };
+                            if (customers.FirstOrDefault(customer => customer.Id == CustomerId) == null)
+                            {
+                                customer.products.Add(product);
+                                customers.Add(customer);
+                            }
+                            else
+                            {
+                                Customer customerWithProducts = customers.FirstOrDefault(customer => customer.Id == CustomerId);
+                                customerWithProducts.products.Add(product);
+                            }
+                              
+                        }
+                        else
+                        {
+                            if (customers.FirstOrDefault(customer => customer.Id == CustomerId) == null)
+                            {
+                                customers.Add(customer);
+                            }
+                        }
+
                     }
                     reader.Close();
                     return Ok(customers);
