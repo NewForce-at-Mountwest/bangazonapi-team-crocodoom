@@ -36,22 +36,61 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    string query = "SELECT Id, FirstName, LastName, DepartmentId, isSupervisor FROM Employee";
+                    string query = "SELECT Employee.Id AS 'Id', FirstName, LastName, isSupervisor, DepartmentId, Department.Name AS 'DepartmentName',Computer.Manufacturer AS 'Manufacturer'," +
+                        " Computer.PurchaseDate AS 'PurchaseDate', Computer.DecomissionDate AS 'Decomission', ComputerId, Computer.Make AS 'Make' FROM Employee " +
+                        "LEFT JOIN ComputerEmployee ON ComputerEmployee.EmployeeId = Employee.Id LEFT JOIN Computer ON Computer.Id = ComputerEmployee.ComputerId  LEFT JOIN Department ON DepartmentId = Department.Id";
                    
                     cmd.CommandText = query;
                     SqlDataReader reader = cmd.ExecuteReader();
                     List<Employee> employees = new List<Employee>();
                     while (reader.Read())
                     {
-                        Employee employee = new Employee
+                        int EmployeeIdValue = reader.GetInt32(reader.GetOrdinal("Id"));
+
+                        if (reader.IsDBNull(reader.GetOrdinal("Make")) != true)
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("isSupervisor"))
-                        };
-                        employees.Add(employee);
+                            Employee employee = new Employee
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                DepartmentName = reader.GetString(reader.GetOrdinal("DepartmentName")),
+                                IsSupervisor = reader.GetBoolean(reader.GetOrdinal("isSupervisor")),
+                                AssignedComputer = new Computer
+                                {
+                                    Make = reader.GetString(reader.GetOrdinal("Make")),
+                                    Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                                    DecommissionDate = reader.GetDateTime(reader.GetOrdinal("Decomission")),
+                                    PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
+                                }
+                            };
+                            if (employees.FirstOrDefault(employee => employee.Id == EmployeeIdValue) == null)
+                            {
+
+                                employees.Add(employee);
+                            }
+                        
+                        }
+                        else
+                        {
+                            Employee employee = new Employee
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                DepartmentName = reader.GetString(reader.GetOrdinal("DepartmentName")),
+                                IsSupervisor = reader.GetBoolean(reader.GetOrdinal("isSupervisor"))
+                            };
+                            if (employees.FirstOrDefault(employee => employee.Id == EmployeeIdValue) == null)
+                            {
+
+                                employees.Add(employee);
+                            }
+                         
+                        }
+                       
                     }
                     reader.Close();
                     return Ok(employees);
@@ -68,21 +107,48 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"SELECT Id, FirstName, LastName, DepartmentId, isSupervisor FROM Employee WHERE Employee.Id = @Id";
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    cmd.CommandText = $"SELECT Employee.Id AS 'Id', FirstName, LastName, isSupervisor, DepartmentId, Department.Name AS 'DepartmentName',Computer.Manufacturer AS 'Manufacturer'," +
+                        " Computer.PurchaseDate AS 'PurchaseDate', Computer.DecomissionDate AS 'Decomission', ComputerId, Computer.Make AS 'Make' FROM Employee " +
+                        "LEFT JOIN ComputerEmployee ON ComputerEmployee.EmployeeId = Employee.Id LEFT JOIN Computer ON Computer.Id = ComputerEmployee.ComputerId  LEFT JOIN Department ON DepartmentId = Department.Id WHERE Employee.Id = @Id";
+                    cmd.Parameters.Add(new SqlParameter("@Id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
                     Employee employee = null;
                     if (reader.Read())
                     {
-                        employee = new Employee
+                        int EmployeeIdValue = reader.GetInt32(reader.GetOrdinal("Id"));
+
+                        if (reader.IsDBNull(reader.GetOrdinal("Make")) != true) { 
+                            employee = new Employee
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            DepartmentName = reader.GetString(reader.GetOrdinal("DepartmentName")),
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("isSupervisor"))
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("isSupervisor")),
+                            AssignedComputer = new Computer
+                            {
+                                Make = reader.GetString(reader.GetOrdinal("Make")),
+                                Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                                DecommissionDate = reader.GetDateTime(reader.GetOrdinal("Decomission")),
+                                PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
+                            }
 
                         };
+                        }
+                        else
+                        {
+                             employee = new Employee
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                DepartmentName = reader.GetString(reader.GetOrdinal("DepartmentName")),
+                                IsSupervisor = reader.GetBoolean(reader.GetOrdinal("isSupervisor"))
+                            };
+                         
+                        }
                     }
                     reader.Close();
 
@@ -159,7 +225,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // DELETE: api/ApiWithActions/5
+ //DELETE method for testing purposes
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {

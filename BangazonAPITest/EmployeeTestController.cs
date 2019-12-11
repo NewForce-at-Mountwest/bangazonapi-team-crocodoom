@@ -17,7 +17,9 @@ namespace BangazonAPITest
             FirstName = "Testy",
             LastName = "Testerson",
             DepartmentId = 1,
-            IsSupervisor = true 
+            DepartmentName = "Tech",
+            AssignedComputer = null,
+            IsSupervisor = true
 
         };
         private string url { get; } = "/api/Employee";
