@@ -9,9 +9,12 @@
     }
   },
   "profiles": {
-    "IIS Express": {
-      "commandName": "IISExpress",
+    "BangazonAPI": {
+      "commandName": "Project",
       "launchBrowser": true,
+
+      "applicationUrl": "http://localhost:5000",
+
 
       "launchUrl": "api/Product",
 
@@ -19,11 +22,13 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "BangazonAPI": {
-      "commandName": "Project",
+    "IIS Express": {
+      "commandName": "IISExpress",
       "launchBrowser": true,
+
       "launchUrl": "api/Product",
       "applicationUrl": "http://localhost:5000",
+
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
