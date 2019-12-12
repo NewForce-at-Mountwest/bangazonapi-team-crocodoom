@@ -92,7 +92,8 @@ CREATE TABLE EmployeeTraining (
 
 CREATE TABLE ProductType (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
-	[Name] VARCHAR(55) NOT NULL
+	[Name] VARCHAR(55) NOT NULL,
+	IsActive bit NOT NULL Default(0)
 );
 
 CREATE TABLE Customer (
@@ -174,4 +175,6 @@ INSERT into Product (ProductTypeId, CustomerId, Price, Title, [Description], Qua
 INSERT into Product (ProductTypeId, CustomerId, Price, Title, [Description], Quantity) VALUES (3, 3, 3, 'Your Favorite Bowl', 'No-spill bowl', 15);
 INSERT into OrderProduct (OrderId, ProductId) VALUES (1,2);
 INSERT into OrderProduct (OrderId, ProductId) VALUES (2,3);
+
 INSERT into OrderProduct (OrderId, ProductId) VALUES (3,1);
+
