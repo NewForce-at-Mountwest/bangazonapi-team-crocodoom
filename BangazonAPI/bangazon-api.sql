@@ -92,7 +92,8 @@ CREATE TABLE EmployeeTraining (
 
 CREATE TABLE ProductType (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
-	[Name] VARCHAR(55) NOT NULL
+	[Name] VARCHAR(55) NOT NULL,
+	IsActive bit NOT NULL Default(0)
 );
 
 CREATE TABLE Customer (
