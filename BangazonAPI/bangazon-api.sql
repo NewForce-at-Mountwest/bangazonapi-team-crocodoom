@@ -103,6 +103,7 @@ CREATE TABLE PaymentType (
 	AcctNumber INTEGER NOT NULL,
 	[Name] VARCHAR(55) NOT NULL,
 	CustomerId INTEGER NOT NULL,
+	IsActive bit NOT NULL default(1),
     CONSTRAINT FK_PaymentType_Customer FOREIGN KEY(CustomerId) REFERENCES Customer(Id)
 );
 CREATE TABLE [Order] (
@@ -154,4 +155,6 @@ INSERT into Product (ProductTypeId, CustomerId, Price, Title, [Description], Qua
 INSERT into Product (ProductTypeId, CustomerId, Price, Title, [Description], Quantity) VALUES (3, 3, 3, 'Your Favorite Bowl', 'No-spill bowl', 15);
 INSERT into OrderProduct (OrderId, ProductId) VALUES (1,2);
 INSERT into OrderProduct (OrderId, ProductId) VALUES (2,3);
+
 INSERT into OrderProduct (OrderId, ProductId) VALUES (3,1);
+
