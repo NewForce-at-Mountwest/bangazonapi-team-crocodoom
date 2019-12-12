@@ -18,7 +18,7 @@ namespace BangazonAPITest
             LastName = "Testerson",
             DepartmentId = 1,
             DepartmentName = "Tech",
-            AssignedComputer = null,
+            AssignedComputers = null,
             IsSupervisor = true
 
         };

@@ -13,7 +13,7 @@ namespace BangazonAPI.Models
             public int DepartmentId { get; set; }
         public string DepartmentName{ get; set; }
           public  bool IsSupervisor { get; set; }
-        public Computer AssignedComputer { get; set; }
+        public List<Computer> AssignedComputers { get; set; } = new List<Computer>();
         
     }
 }

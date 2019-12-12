@@ -49,6 +49,13 @@ namespace BangazonAPI.Controllers
 
                         if (reader.IsDBNull(reader.GetOrdinal("Make")) != true)
                         {
+                            Computer AssignedComputer = new Computer
+                            {
+                                Make = reader.GetString(reader.GetOrdinal("Make")),
+                                Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                                DecommissionDate = reader.GetDateTime(reader.GetOrdinal("Decomission")),
+                                PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
+                            };
                             Employee employee = new Employee
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
@@ -57,18 +64,13 @@ namespace BangazonAPI.Controllers
                                 DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                                 DepartmentName = reader.GetString(reader.GetOrdinal("DepartmentName")),
                                 IsSupervisor = reader.GetBoolean(reader.GetOrdinal("isSupervisor")),
-                                AssignedComputer = new Computer
-                                {
-                                    Make = reader.GetString(reader.GetOrdinal("Make")),
-                                    Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
-                                    DecommissionDate = reader.GetDateTime(reader.GetOrdinal("Decomission")),
-                                    PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
-                                }
+                               
                             };
                             if (employees.FirstOrDefault(employee => employee.Id == EmployeeIdValue) == null)
                             {
-
+                                employee.AssignedComputers.Add(AssignedComputer);
                                 employees.Add(employee);
+                                
                             }
                         
                         }
@@ -117,7 +119,14 @@ namespace BangazonAPI.Controllers
                     {
                         int EmployeeIdValue = reader.GetInt32(reader.GetOrdinal("Id"));
 
-                        if (reader.IsDBNull(reader.GetOrdinal("Make")) != true) { 
+                        if (reader.IsDBNull(reader.GetOrdinal("Make")) != true) {
+                            Computer AssignedComputer = new Computer
+                            {
+                                Make = reader.GetString(reader.GetOrdinal("Make")),
+                                Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                                DecommissionDate = reader.GetDateTime(reader.GetOrdinal("Decomission")),
+                                PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
+                            };
                             employee = new Employee
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
@@ -126,15 +135,8 @@ namespace BangazonAPI.Controllers
                             DepartmentName = reader.GetString(reader.GetOrdinal("DepartmentName")),
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                             IsSupervisor = reader.GetBoolean(reader.GetOrdinal("isSupervisor")),
-                            AssignedComputer = new Computer
-                            {
-                                Make = reader.GetString(reader.GetOrdinal("Make")),
-                                Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
-                                DecommissionDate = reader.GetDateTime(reader.GetOrdinal("Decomission")),
-                                PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
-                            }
-
                         };
+                            employee.AssignedComputers.Add(AssignedComputer);
                         }
                         else
                         {
@@ -166,14 +168,17 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Employee (firstName, lastName, DepartmentId, isSupervisor)
+                    string query = @"INSERT INTO Employee (firstName, lastName, DepartmentId, isSupervisor)
                                         OUTPUT INSERTED.Id
                                         VALUES (@firstName, @lastName, @DepartmentId, @isSupervisor)";
+                 
+                    cmd.CommandText = query;
                     cmd.Parameters.Add(new SqlParameter("@firstName", employee.FirstName));
                     cmd.Parameters.Add(new SqlParameter("@lastName", employee.LastName));
                     cmd.Parameters.Add(new SqlParameter("@DepartmentId", employee.DepartmentId));
                     cmd.Parameters.Add(new SqlParameter("@isSupervisor", employee.IsSupervisor));
-                    int newId = (int)cmd.ExecuteScalar();
+            
+                        int newId = (int)cmd.ExecuteScalar();
                     employee.Id = newId;
                     return CreatedAtRoute("GetEmployee", new { id = newId }, employee);
                 }
