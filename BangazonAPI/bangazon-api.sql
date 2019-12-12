@@ -1,29 +1,29 @@
-DELETE FROM OrderProduct;
-DELETE FROM ComputerEmployee;
-DELETE FROM EmployeeTraining;
-DELETE FROM Employee;
-DELETE FROM TrainingProgram;
-DELETE FROM Computer;
-DELETE FROM Department;
-DELETE FROM [Order];
-DELETE FROM PaymentType;
-DELETE FROM Product;
-DELETE FROM ProductType;
-DELETE FROM Customer;
+--DELETE FROM OrderProduct;
+--DELETE FROM ComputerEmployee;
+--DELETE FROM EmployeeTraining;
+--DELETE FROM Employee;
+--DELETE FROM TrainingProgram;
+--DELETE FROM Computer;
+--DELETE FROM Department;
+--DELETE FROM [Order];
+--DELETE FROM PaymentType;
+--DELETE FROM Product;
+--DELETE FROM ProductType;
+--DELETE FROM Customer;
 
 
-ALTER TABLE Employee DROP CONSTRAINT [FK_EmployeeDepartment];
-ALTER TABLE ComputerEmployee DROP CONSTRAINT [FK_ComputerEmployee_Employee];
-ALTER TABLE ComputerEmployee DROP CONSTRAINT [FK_ComputerEmployee_Computer];
-ALTER TABLE EmployeeTraining DROP CONSTRAINT [FK_EmployeeTraining_Employee];
-ALTER TABLE EmployeeTraining DROP CONSTRAINT [FK_EmployeeTraining_Training];
-ALTER TABLE Product DROP CONSTRAINT [FK_Product_ProductType];
-ALTER TABLE Product DROP CONSTRAINT [FK_Product_Customer];
-ALTER TABLE PaymentType DROP CONSTRAINT [FK_PaymentType_Customer];
-ALTER TABLE [Order] DROP CONSTRAINT [FK_Order_Customer];
-ALTER TABLE [Order] DROP CONSTRAINT [FK_Order_Payment];
-ALTER TABLE OrderProduct DROP CONSTRAINT [FK_OrderProduct_Product];
-ALTER TABLE OrderProduct DROP CONSTRAINT [FK_OrderProduct_Order];
+--ALTER TABLE Employee DROP CONSTRAINT [FK_EmployeeDepartment];
+--ALTER TABLE ComputerEmployee DROP CONSTRAINT [FK_ComputerEmployee_Employee];
+--ALTER TABLE ComputerEmployee DROP CONSTRAINT [FK_ComputerEmployee_Computer];
+--ALTER TABLE EmployeeTraining DROP CONSTRAINT [FK_EmployeeTraining_Employee];
+--ALTER TABLE EmployeeTraining DROP CONSTRAINT [FK_EmployeeTraining_Training];
+--ALTER TABLE Product DROP CONSTRAINT [FK_Product_ProductType];
+--ALTER TABLE Product DROP CONSTRAINT [FK_Product_Customer];
+--ALTER TABLE PaymentType DROP CONSTRAINT [FK_PaymentType_Customer];
+--ALTER TABLE [Order] DROP CONSTRAINT [FK_Order_Customer];
+--ALTER TABLE [Order] DROP CONSTRAINT [FK_Order_Payment];
+--ALTER TABLE OrderProduct DROP CONSTRAINT [FK_OrderProduct_Product];
+--ALTER TABLE OrderProduct DROP CONSTRAINT [FK_OrderProduct_Order];
 
 
 DROP TABLE IF EXISTS OrderProduct;
@@ -120,6 +120,7 @@ CREATE TABLE PaymentType (
 	AcctNumber INTEGER NOT NULL,
 	[Name] VARCHAR(55) NOT NULL,
 	CustomerId INTEGER NOT NULL,
+	IsActive bit NOT NULL default(1),
     CONSTRAINT FK_PaymentType_Customer FOREIGN KEY(CustomerId) REFERENCES Customer(Id)
 );
 
@@ -174,4 +175,6 @@ INSERT into Product (ProductTypeId, CustomerId, Price, Title, [Description], Qua
 INSERT into Product (ProductTypeId, CustomerId, Price, Title, [Description], Quantity) VALUES (3, 3, 3, 'Your Favorite Bowl', 'No-spill bowl', 15);
 INSERT into OrderProduct (OrderId, ProductId) VALUES (1,2);
 INSERT into OrderProduct (OrderId, ProductId) VALUES (2,3);
+
 INSERT into OrderProduct (OrderId, ProductId) VALUES (3,1);
+
