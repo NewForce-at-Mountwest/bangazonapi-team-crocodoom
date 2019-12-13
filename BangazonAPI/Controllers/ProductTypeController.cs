@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using BangazonAPI.Models;
 using System.Data.SqlClient;
-
 namespace BangazonAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -16,12 +15,10 @@ namespace BangazonAPI.Controllers
     {
         // Connecting to the SQL Database
         private readonly IConfiguration _config;
-
         public ProductTypeController(IConfiguration config)
         {
             _config = config;
         }
-
         public SqlConnection Connection
         {
             get
@@ -29,7 +26,6 @@ namespace BangazonAPI.Controllers
                 return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
             }
         }
-
         //Getting all Product Types
         // GET: api/ProductType
         [HttpGet]
@@ -44,24 +40,19 @@ namespace BangazonAPI.Controllers
                                         FROM ProductType";
                     SqlDataReader reader = cmd.ExecuteReader();
                     List<ProductType> productTypes = new List<ProductType>();
-
                     while (reader.Read())
                     {
                         ProductType productType = new ProductType
                         {
                             Name = reader.GetString(reader.GetOrdinal("Name"))
-
                         };
-
                         productTypes.Add(productType);
                     }
                     reader.Close();
-
                     return Ok(productTypes);
                 }
             }
         }
-
         // Get a single ProductType by id
         // GET: api/ProductType/5
         [HttpGet("{id}", Name = "GetProductType")]
@@ -79,9 +70,7 @@ namespace BangazonAPI.Controllers
                         WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
-
                     ProductType productType = null;
-
                     if (reader.Read())
                     {
                         productType = new ProductType
@@ -90,12 +79,10 @@ namespace BangazonAPI.Controllers
                         };
                     }
                     reader.Close();
-
                     return Ok(productType);
                 }
             }
         }
-
         //Post a new Product Type
         // POST: api/ProductType
         public async Task<IActionResult> Post([FromBody] ProductType productType)
@@ -108,17 +95,13 @@ namespace BangazonAPI.Controllers
                     cmd.CommandText = @"INSERT INTO ProductType (Name)
                                         OUTPUT INSERTED.Id
                                         VALUES (@name)";
-
                     cmd.Parameters.Add(new SqlParameter("@name", productType.Name));
-
-
                     int newId = (int)cmd.ExecuteScalar();
                     productType.Id = newId;
                     return CreatedAtRoute("GetProductType", new { id = newId }, productType);
                 }
             }
         }
-
         //Update the PaymentType
         // PUT: api/PaymentType/5
         [HttpPut("{id}")]
@@ -136,9 +119,6 @@ namespace BangazonAPI.Controllers
                                             WHERE Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
                         cmd.Parameters.Add(new SqlParameter("@name", productType.Name));
-
-
-
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)
                         {
@@ -160,7 +140,6 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
-
         //SoftDeleting a ProductType if there is no product assiociated with it
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
@@ -206,7 +185,6 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
-
         private bool ProductTypeExists(int id)
         {
             using (SqlConnection conn = Connection)
@@ -219,13 +197,12 @@ namespace BangazonAPI.Controllers
                         FROM ProductType
                         WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
-
                     SqlDataReader reader = cmd.ExecuteReader();
                     return reader.Read();
                 }
             }
         }
-
-
     }
 }
+
+
