@@ -10,8 +10,6 @@
 --DELETE FROM Product;
 --DELETE FROM ProductType;
 --DELETE FROM Customer;
-
-
 --ALTER TABLE Employee DROP CONSTRAINT [FK_EmployeeDepartment];
 --ALTER TABLE ComputerEmployee DROP CONSTRAINT [FK_ComputerEmployee_Employee];
 --ALTER TABLE ComputerEmployee DROP CONSTRAINT [FK_ComputerEmployee_Computer];
@@ -24,8 +22,6 @@
 --ALTER TABLE [Order] DROP CONSTRAINT [FK_Order_Payment];
 --ALTER TABLE OrderProduct DROP CONSTRAINT [FK_OrderProduct_Product];
 --ALTER TABLE OrderProduct DROP CONSTRAINT [FK_OrderProduct_Order];
-
-
 DROP TABLE IF EXISTS OrderProduct;
 DROP TABLE IF EXISTS ComputerEmployee;
 DROP TABLE IF EXISTS EmployeeTraining;
@@ -38,14 +34,11 @@ DROP TABLE IF EXISTS PaymentType;
 DROP TABLE IF EXISTS Product;
 DROP TABLE IF EXISTS ProductType;
 DROP TABLE IF EXISTS Customer;
-
-
 CREATE TABLE Department (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 	[Name] VARCHAR(55) NOT NULL,
 	Budget 	INTEGER NOT NULL
 );
-
 CREATE TABLE Employee (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 	FirstName VARCHAR(55) NOT NULL,
@@ -54,7 +47,6 @@ CREATE TABLE Employee (
 	IsSuperVisor BIT NOT NULL DEFAULT(0),
     CONSTRAINT FK_EmployeeDepartment FOREIGN KEY(DepartmentId) REFERENCES Department(Id)
 );
-
 CREATE TABLE Computer (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 	PurchaseDate DATETIME NOT NULL,
@@ -62,7 +54,6 @@ CREATE TABLE Computer (
 	Make VARCHAR(55) NOT NULL,
 	Manufacturer VARCHAR(55) NOT NULL
 );
-
 CREATE TABLE ComputerEmployee (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 	EmployeeId INTEGER NOT NULL,
@@ -72,8 +63,6 @@ CREATE TABLE ComputerEmployee (
     CONSTRAINT FK_ComputerEmployee_Employee FOREIGN KEY(EmployeeId) REFERENCES Employee(Id),
     CONSTRAINT FK_ComputerEmployee_Computer FOREIGN KEY(ComputerId) REFERENCES Computer(Id)
 );
-
-
 CREATE TABLE TrainingProgram (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 	[Name] VARCHAR(255) NOT NULL,
@@ -81,7 +70,6 @@ CREATE TABLE TrainingProgram (
 	EndDate DATETIME NOT NULL,
 	MaxAttendees INTEGER NOT NULL
 );
-
 CREATE TABLE EmployeeTraining (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 	EmployeeId INTEGER NOT NULL,
@@ -89,19 +77,16 @@ CREATE TABLE EmployeeTraining (
     CONSTRAINT FK_EmployeeTraining_Employee FOREIGN KEY(EmployeeId) REFERENCES Employee(Id),
     CONSTRAINT FK_EmployeeTraining_Training FOREIGN KEY(TrainingProgramId) REFERENCES TrainingProgram(Id)
 );
-
 CREATE TABLE ProductType (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 	[Name] VARCHAR(55) NOT NULL,
 	IsActive bit NOT NULL Default(0)
 );
-
 CREATE TABLE Customer (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 	FirstName VARCHAR(55) NOT NULL,
 	LastName VARCHAR(55) NOT NULL
 );
-
 CREATE TABLE Product (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 	ProductTypeId INTEGER NOT NULL,
@@ -113,8 +98,6 @@ CREATE TABLE Product (
     CONSTRAINT FK_Product_ProductType FOREIGN KEY(ProductTypeId) REFERENCES ProductType(Id),
     CONSTRAINT FK_Product_Customer FOREIGN KEY(CustomerId) REFERENCES Customer(Id)
 );
-
-
 CREATE TABLE PaymentType (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 	AcctNumber INTEGER NOT NULL,
@@ -123,7 +106,6 @@ CREATE TABLE PaymentType (
 	IsActive bit NOT NULL default(1),
     CONSTRAINT FK_PaymentType_Customer FOREIGN KEY(CustomerId) REFERENCES Customer(Id)
 );
-
 CREATE TABLE [Order] (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 	CustomerId INTEGER NOT NULL,
@@ -131,7 +113,6 @@ CREATE TABLE [Order] (
     CONSTRAINT FK_Order_Customer FOREIGN KEY(CustomerId) REFERENCES Customer(Id),
     CONSTRAINT FK_Order_Payment FOREIGN KEY(PaymentTypeId) REFERENCES PaymentType(Id)
 );
-
 CREATE TABLE OrderProduct (
 	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 	OrderId INTEGER NOT NULL,
@@ -139,7 +120,6 @@ CREATE TABLE OrderProduct (
     CONSTRAINT FK_OrderProduct_Product FOREIGN KEY(ProductId) REFERENCES Product(Id),
     CONSTRAINT FK_OrderProduct_Order FOREIGN KEY(OrderId) REFERENCES [Order](Id)
 );
-
 INSERT INTO Department ([Name], Budget) VALUES ('Accounting', 32718);
 INSERT INTO Department ([Name], Budget) VALUES  ('Manufacturing', 43700);
 INSERT INTO Department ([Name], Budget) VALUES ('Shipping', 19350);
