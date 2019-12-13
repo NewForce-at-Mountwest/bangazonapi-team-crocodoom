@@ -19,7 +19,7 @@ namespace BangazonAPITest
             DepartmentId = 1,
             DepartmentName = "Tech",
             AssignedComputers = null,
-            IsSupervisor = true
+            IsSuperVisor = true
 
         };
         private string url { get; } = "/api/Employee";
@@ -122,7 +122,7 @@ namespace BangazonAPITest
                 Assert.Equal(newTestyTesterson.FirstName, TestyTestersonFromDB.FirstName);
                 Assert.Equal(newTestyTesterson.LastName, TestyTestersonFromDB.LastName);
                 Assert.Equal(newTestyTesterson.DepartmentId, TestyTestersonFromDB.DepartmentId);
-                Assert.Equal(newTestyTesterson.IsSupervisor, TestyTestersonFromDB.IsSupervisor);
+                Assert.Equal(newTestyTesterson.IsSuperVisor, TestyTestersonFromDB.IsSuperVisor);
                 // Clean up after ourselves-- delete the dummy Employee we just created
                 await DeleteDummyEmployee(TestyTestersonFromDB);
             }
