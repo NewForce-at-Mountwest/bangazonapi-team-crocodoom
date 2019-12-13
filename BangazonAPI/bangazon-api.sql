@@ -157,4 +157,3 @@ INSERT into OrderProduct (OrderId, ProductId) VALUES (1,2);
 INSERT into OrderProduct (OrderId, ProductId) VALUES (2,3);
 
 INSERT into OrderProduct (OrderId, ProductId) VALUES (3,1);
-
