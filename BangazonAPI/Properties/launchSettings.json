@@ -12,8 +12,12 @@
     "BangazonAPI": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/Customer",
+
       "applicationUrl": "http://localhost:5000",
+
+
+      "launchUrl": "api/Product",
+
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -21,7 +25,10 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api/Customer",
+
+      "launchUrl": "api/Product",
+      "applicationUrl": "http://localhost:5000",
+
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

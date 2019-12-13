@@ -1,25 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using BangazonAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using BangazonAPI.Models;
+using System.Data.SqlClient;
 
 namespace BangazonAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmployeeController : ControllerBase
+    public class ProductTypeController : ControllerBase
     {
+        // Connecting to the SQL Database
         private readonly IConfiguration _config;
 
-        public EmployeeController(IConfiguration config)
+        public ProductTypeController(IConfiguration config)
         {
             _config = config;
         }
+
         public SqlConnection Connection
         {
             get
@@ -27,7 +29,9 @@ namespace BangazonAPI.Controllers
                 return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
             }
         }
-        // GET: api/Employee
+
+        //Getting all Product Types
+        // GET: api/ProductType
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -36,13 +40,20 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
+<<<<<<< HEAD:BangazonAPI/Controllers/EmployeeController.cs
                     string query = "SELECT Employee.Id AS 'Id', FirstName, LastName, isSupervisor, DepartmentId, Department.Name AS 'DepartmentName', Computer.manufacturer AS 'manufacturer', Computer.purchaseDate AS 'purchaseDate', Computer.decomissionDate AS 'decomission', ComputerId, Computer.make AS 'make' FROM Employee LEFT JOIN ComputerEmployee ON ComputerEmployee.EmployeeId = Employee.Id LEFT JOIN Computer ON Computer.Id = ComputerEmployee.ComputerId  LEFT JOIN Department ON DepartmentId = Department.Id";
 
                     cmd.CommandText = query;
+=======
+                    cmd.CommandText = @"SELECT Name
+                                        FROM ProductType";
+>>>>>>> master:BangazonAPI/Controllers/ProductTypeController.cs
                     SqlDataReader reader = cmd.ExecuteReader();
-                    List<Employee> employees = new List<Employee>();
+                    List<ProductType> productTypes = new List<ProductType>();
+
                     while (reader.Read())
                     {
+<<<<<<< HEAD:BangazonAPI/Controllers/EmployeeController.cs
                         int EmployeeIdValue = reader.GetInt32(reader.GetOrdinal("Id"));
                         if (reader.IsDBNull(reader.GetOrdinal("purchaseDate")) == false)
                         {
@@ -117,15 +128,26 @@ namespace BangazonAPI.Controllers
                                 employees.Add(employee);
                             }
                         }
+=======
+                        ProductType productType = new ProductType
+                        {
+                            Name = reader.GetString(reader.GetOrdinal("Name"))
+
+                        };
+
+                        productTypes.Add(productType);
+>>>>>>> master:BangazonAPI/Controllers/ProductTypeController.cs
                     }
                     reader.Close();
-                    return Ok(employees);
+
+                    return Ok(productTypes);
                 }
             }
         }
 
-        // GET: api/Employee/5
-        [HttpGet("{id}", Name = "GetEmployee")]
+        // Get a single ProductType by id
+        // GET: api/ProductType/5
+        [HttpGet("{id}", Name = "GetProductType")]
         public async Task<IActionResult> Get([FromRoute] int id)
         {
             using (SqlConnection conn = Connection)
@@ -133,14 +155,26 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
+<<<<<<< HEAD:BangazonAPI/Controllers/EmployeeController.cs
                     cmd.CommandText = $"SELECT Employee.Id AS 'Id', FirstName, LastName, isSupervisor, DepartmentId, Department.Name AS 'DepartmentName',Computer.manufacturer AS 'manufacturer'," +
                         " Computer.purchaseDate AS 'purchaseDate', Computer.decomissionDate AS 'decomission', ComputerId, Computer.make AS 'make' FROM Employee " +
                         "LEFT JOIN ComputerEmployee ON ComputerEmployee.EmployeeId = Employee.Id LEFT JOIN Computer ON Computer.Id = ComputerEmployee.ComputerId  LEFT JOIN Department ON DepartmentId = Department.Id WHERE Employee.Id = @Id";
                     cmd.Parameters.Add(new SqlParameter("@Id", id));
+=======
+                    cmd.CommandText = @"
+                        SELECT
+                             Name
+                        FROM ProductType
+                        WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+>>>>>>> master:BangazonAPI/Controllers/ProductTypeController.cs
                     SqlDataReader reader = cmd.ExecuteReader();
-                    Employee employee = null;
+
+                    ProductType productType = null;
+
                     if (reader.Read())
                     {
+<<<<<<< HEAD:BangazonAPI/Controllers/EmployeeController.cs
                         int EmployeeIdValue = reader.GetInt32(reader.GetOrdinal("Id"));
                         if (reader.IsDBNull(reader.GetOrdinal("purchaseDate")) == false)
                         {
@@ -204,40 +238,47 @@ namespace BangazonAPI.Controllers
                             };
 
                         }
+=======
+                        productType = new ProductType
+                        {
+                            Name = reader.GetString(reader.GetOrdinal("Name"))
+                        };
+>>>>>>> master:BangazonAPI/Controllers/ProductTypeController.cs
                     }
                     reader.Close();
 
-                    return Ok(employee);
+                    return Ok(productType);
                 }
             }
         }
 
-        // POST: api/Employee
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Employee employee)
+        //Post a new Product Type
+        // POST: api/ProductType
+        public async Task<IActionResult> Post([FromBody] ProductType productType)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Employee (firstName, lastName, DepartmentId, isSupervisor)
+                    cmd.CommandText = @"INSERT INTO ProductType (Name)
                                         OUTPUT INSERTED.Id
-                                        VALUES (@firstName, @lastName, @DepartmentId, @isSupervisor)";
-                    cmd.Parameters.Add(new SqlParameter("@firstName", employee.FirstName));
-                    cmd.Parameters.Add(new SqlParameter("@lastName", employee.LastName));
-                    cmd.Parameters.Add(new SqlParameter("@DepartmentId", employee.DepartmentId));
-                    cmd.Parameters.Add(new SqlParameter("@isSupervisor", employee.IsSupervisor));
+                                        VALUES (@name)";
+
+                    cmd.Parameters.Add(new SqlParameter("@name", productType.Name));
+
+
                     int newId = (int)cmd.ExecuteScalar();
-                    employee.Id = newId;
-                    return CreatedAtRoute("GetEmployee", new { id = newId }, employee);
+                    productType.Id = newId;
+                    return CreatedAtRoute("GetProductType", new { id = newId }, productType);
                 }
             }
         }
 
-        // PUT: api/Employee/5
+        //Update the PaymentType
+        // PUT: api/PaymentType/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Employee employee)
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] ProductType productType)
         {
             try
             {
@@ -246,17 +287,13 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"UPDATE Employee
-                                            SET FirstName = @FirstName,
-                                                LastName = @LastName,
-                                                DepartmentId = @DepartmentId,
-                                                isSupervisor = @isSupervisor
+                        cmd.CommandText = @"UPDATE ProductType
+                                            SET Name = @name
                                             WHERE Id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@FirstName", employee.FirstName));
-                        cmd.Parameters.Add(new SqlParameter("@LastName", employee.LastName));
-                        cmd.Parameters.Add(new SqlParameter("@DepartmentId", employee.DepartmentId));
-                        cmd.Parameters.Add(new SqlParameter("@isSupervisor", employee.IsSupervisor));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
+                        cmd.Parameters.Add(new SqlParameter("@name", productType.Name));
+
+
 
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)
@@ -269,7 +306,7 @@ namespace BangazonAPI.Controllers
             }
             catch (Exception)
             {
-                if (!EmployeeExists(id))
+                if (!ProductTypeExists(id))
                 {
                     return NotFound();
                 }
@@ -280,10 +317,15 @@ namespace BangazonAPI.Controllers
             }
         }
 
+<<<<<<< HEAD:BangazonAPI/Controllers/EmployeeController.cs
         //DELETE method for testing purposes
 
+=======
+        //SoftDeleting a ProductType if there is no product assiociated with it
+        // DELETE: api/ApiWithActions/5
+>>>>>>> master:BangazonAPI/Controllers/ProductTypeController.cs
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
+        public async Task<IActionResult> DeleteProductType([FromRoute] int id, bool HardDelete)
         {
             try
             {
@@ -292,9 +334,18 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"DELETE FROM Employee WHERE Id = @id";
+                        if (HardDelete == true)
+                        {
+                            cmd.CommandText = @"DELETE ProductType
+                                              WHERE id = @id";
+                        }
+                        else
+                        {
+                            cmd.CommandText = @"UPDATE ProductType
+                                            SET isActive = 0
+                                            WHERE id = @id";
+                        }
                         cmd.Parameters.Add(new SqlParameter("@id", id));
-
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)
                         {
@@ -306,7 +357,7 @@ namespace BangazonAPI.Controllers
             }
             catch (Exception)
             {
-                if (!EmployeeExists(id))
+                if (!ProductTypeExists(id))
                 {
                     return NotFound();
                 }
@@ -316,7 +367,8 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
-        private bool EmployeeExists(int id)
+
+        private bool ProductTypeExists(int id)
         {
             using (SqlConnection conn = Connection)
             {
@@ -324,8 +376,8 @@ namespace BangazonAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, FirstName, LastName, DepartmentId, isSupervisor
-                        FROM Employee 
+                        SELECT Name
+                        FROM ProductType
                         WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
@@ -334,5 +386,7 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
+
+
     }
 }
